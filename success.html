@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Success — Pixelgrids.net</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b0f19] text-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-[#111827] border border-gray-800 p-8 rounded-3xl max-w-md w-full shadow-2xl">
+        <h2 class="text-2xl font-bold mb-2 text-white">Slot Submission 🎉</h2>
+        <p class="text-sm text-gray-400 mb-6">Fill in your brand details below to instantly publish your spot on Pixelgrids.net.</p>
+        
+        <form action="/api/save-brand" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Slot Number (1-100)</label>
+                <input type="number" name="slot_id" required class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl p-3 text-white text-sm">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Brand Name</label>
+                <input type="text" name="brand_name" required class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl p-3 text-white text-sm">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Logo Emoji (e.g. 💍)</label>
+                <input type="text" name="logo_emoji" required class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl p-3 text-white text-sm">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Video URL (.mp4 direct link)</label>
+                <input type="url" name="video_url" required class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl p-3 text-white text-sm">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Coupon Code</label>
+                <input type="text" name="coupon_code" class="w-full bg-[#0b0f19] border border-gray-800 rounded-xl p-3 text-white text-sm">
+            
