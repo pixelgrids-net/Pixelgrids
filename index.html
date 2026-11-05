@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixelgrids.net — The Next-Gen Attention Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0b0f19',
+                        cardbg: '#111827',
+                        accent: '#6366f1',
+                        accenthover: '#4f46e5'
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-darkbg text-gray-100 min-h-screen flex flex-col font-sans selection:bg-accent selection:text-white">
+
+    <!-- Header / Nav -->
+    <header class="border-b border-gray-800 bg-cardbg/50 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i data-lucide="grid" class="w-6 h-6 text-white"></i>
+                </div>
+                <span class="text-xl font-black tracking-wider bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">Pixelgrids<span class="text-indigo-500">.net</span></span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a id="header-cta" href="/success.html" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20">
+                    Claim Free Slot ⚡
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-10 px-4 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(99,102,241,0.15),rgba(255,255,255,0))]"></div>
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="inline-flex items-center space-x-2 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full text-indigo-400 text-xs font-semibold mb-4">
+                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                <span>Attention Marketplace • Built for 2026</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-4">
+                The Ultimate <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Attention Marketplace</span>
+            </h1>
+            <p class="text-base sm:text-lg text-gray-400 mb-6 max-w-2xl mx-auto">
+                100 exclusive slots. Dynamic video previews, instant coupon codes, and high-impact daily auctions.
+            </p>
+
+            <!-- Aftelklok Banner -->
+            <div id="banner-container" class="bg-gradient-to-r from-indigo-900/40 via-purple-900/40 to-pink-900/40 border border-indigo-500/30 rounded-2xl p-4 sm:p-5 text-center backdrop-blur shadow-xl max-w-xl mx-auto mb-4">
+                <p id="banner-title" class="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-1">⚡ Pre-Launch: Get 2 Weeks FREE Until Clock Hits 0! ⚡</p>
+                <div id="countdown" class="flex justify-center gap-4 sm:gap-6 text-white font-mono my-2">
+                    <div class="flex flex-col"><span id="days" class="text-2xl sm:text-3xl font-black">00</span><span class="text-[9px] text-gray-400 uppercase">Days</span></div>
+                    <span class="text-2xl sm:text-3xl font-black text-indigo-500">:</span>
+                    <div class="flex flex-col"><span id="hours" class="text-2xl sm:text-3xl font-black">00</span><span class="text-[9px] text-gray-400 uppercase">Hours</span></div>
+                    <span class="text-2xl sm:text-3xl font-black text-indigo-500">:</span>
+                    <div class="flex flex-col"><span id="minutes" class="text-2xl sm:text-3xl font-black">00</span><span class="text-[9px] text-gray-400 uppercase">Mins</span></div>
+                    <span class="text-2xl sm:text-3xl font-black text-indigo-500">:</span>
+                    <div class="flex flex-col"><span id="seconds" class="text-2xl sm:text-3xl font-black">00</span><span class="text-[9px] text-gray-400 uppercase">Secs</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Grid Section -->
+    <main class="max-w-6xl mx-auto px-4 pb-20 flex-grow w-full" id="grid">
+        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 shadow-2xl relative">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 pb-6 border-b border-gray-800 gap-4">
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <span>Live 10x10 Grid</span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    </h2>
+                    <p class="text-xs text-gray-400">Click any active slot to watch the brand preview & grab exclusive deals.</p>
+                </div>
+            </div>
+
+            <div id="grid-container" class="grid grid-cols-5 sm
