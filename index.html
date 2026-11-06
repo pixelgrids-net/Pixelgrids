@@ -56,11 +56,11 @@
       line-height: 1.4;
     }
 
-    /* Stats Grid */
+    /* Stats Grid - 3 strakke kaarten i.p.v. dubbele info */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
       width: 100%;
       max-width: 480px;
       margin-bottom: 24px;
@@ -70,7 +70,7 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px 8px;
       text-align: center;
     }
 
@@ -80,7 +80,7 @@
 
     .stat-label {
       display: block;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 700;
       letter-spacing: 0.05em;
       color: var(--text-muted);
@@ -89,13 +89,13 @@
     }
 
     .stat-value {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       color: var(--text-main);
     }
 
     .stat-value small {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
       font-weight: 400;
     }
@@ -329,6 +329,7 @@
     <p class="subtitle">Claim your spot on the grid. Showcase your brand, video & active deals to a global audience.</p>
   </header>
 
+  <!-- Opgeschoonde Stats Grid (3 compacte kaarten) -->
   <div class="stats-grid">
     <div class="stat-card">
       <span class="stat-label">Standard Slot</span>
@@ -339,12 +340,8 @@
       <span class="stat-value" style="color: var(--grid-center)">Bidding</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Screen Time</span>
-      <span class="stat-value">20 sec</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">Max Video Length</span>
-      <span class="stat-value">30 sec</span>
+      <span class="stat-label">Video Duration</span>
+      <span class="stat-value">Max 30s</span>
     </div>
   </div>
 
@@ -439,7 +436,7 @@
         modalContent.innerHTML = `
           <h3>Claim Slot #${slotId}</h3>
           <div class="modal-badge ${badgeClass}">${badgeText}</div>
-          <p>${isCenter ? 'Premium center position. Place highest bid for 2 weeks screen time.' : 'Fixed rate for 2 weeks of screen time (20s loop).'}</p>
+          <p>${isCenter ? 'Premium center position. Place highest bid for 2 weeks screen time.' : 'Fixed rate for 2 weeks of screen time (max 30s video).'}</p>
 
           <form onsubmit="handleCheckout(event)">
             <div class="form-group">
