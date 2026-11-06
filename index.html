@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixelgrids.net - Attention Marketplace</title>
-    <!-- Tailwind CSS voor styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,46 +21,63 @@
     <!-- Het 10x10 Grid Container -->
     <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-2xl">
         <div id="grid-container" class="grid grid-cols-10 gap-2 aspect-square">
-            <!-- Wordt dynamisch gevuld vanuit Supabase -->
+            <!-- Wordt dynamisch gevuld -->
         </div>
     </div>
 
-    <!-- Script voor Supabase data ophalen en renderen -->
     <script>
-        // Supabase configuratie (gebruikt je publieke variabelen)
-        const SUPABASE_URL = 'JOUW_SUPABASE_URL'; // Wordt automatisch ingevuld of haalt uit environment
-        const SUPABASE_ANON_KEY = 'JOUW_SUPABASE_ANON_KEY';
+        // Vul hier jouw echte Supabase gegevens in als de omgevingsvariabelen niet direct pakken
+        const SUPABASE_URL = 'https://jouw-project.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'jouw-anon-key';
 
         const { createClient } = supabase;
-        const _supabase = createClient(
-            window.env?.NEXT_PUBLIC_SUPABASE_URL || SUPABASE_URL, 
-            window.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY || SUPABASE_ANON_KEY
-        );
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function loadGridSlots() {
             const container = document.getElementById('grid-container');
             container.innerHTML = '';
 
-            // Haal de data op uit de juiste 'advertisers' tabel
-            const { data, error } = await _supabase.from('advertisers').select('*');
+            try {
+                // Haal data op uit de advertisers tabel
+                const { data, error } = await _supabase.from('advertisers').select('*');
 
-            if (error) {
-                console.error('Fout bij ophalen slots:', error);
-                return;
+                if (error) {
+                    console.error('Supabase fout:', error);
+                    return;
+                }
+
+                const activeSlots = {};
+                if (data) {
+                    data.forEach(item => {
+                        activeSlots[item.slot_id] = item;
+                    });
+                }
+
+                // Genereer de 100 vakjes van het 10x10 grid
+                for (let i = 1; i <= 100; i++) {
+                    const slotDiv = document.createElement('div');
+                    slotDiv.className = "flex items-center justify-center bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold transition hover:border-purple-500 cursor-pointer overflow-hidden relative aspect-square";
+                    
+                    if (activeSlots[i]) {
+                        const advertiser = activeSlots[i];
+                        slotDiv.className += " bg-purple-900/40 border-purple-500";
+                        slotDiv.innerHTML = `
+                            <a href="${advertiser.target_url || '#'}" target="_blank" title="${advertiser.brand_name || 'Grid'}" class="w-full h-full flex flex-col items-center justify-center p-1">
+                                <span class="text-xl">${advertiser.logo_emoji || '🔥'}</span>
+                            </a>
+                        `;
+                    } else {
+                        slotDiv.innerHTML = `<span class="text-slate-600">${i}</span>`;
+                    }
+
+                    container.appendChild(slotDiv);
+                }
+            } catch (err) {
+                console.error('Laad fout:', err);
             }
+        }
 
-            // Maak een lookup map voor snelle matching op slot_id
-            const activeSlots = {};
-            if (data) {
-                data.forEach(item => {
-                    activeSlots[item.slot_id] = item;
-                });
-            }
-
-            // Genereer de 100 vakjes (10x10 grid)
-            for (let i = 1; i <= 100; i++) {
-                const slotDiv = document.createElement('div');
-                slotDiv.className = "flex items-center justify-center bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold transition hover:border-purple-500 cursor-pointer overflow-hidden relative";
-                
-                if (activeSlots[i]) {
-                    const advertiser = activeSlots[i];
+        loadGridSlots();
+    </script>
+</body>
+</html>
