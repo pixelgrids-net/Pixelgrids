@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,7 +56,7 @@
       line-height: 1.4;
     }
 
-    /* Stats Cards Grid */
+    /* Stats Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -100,7 +100,7 @@
       font-weight: 400;
     }
 
-    /* Filters & Legend */
+    /* Legend */
     .legend {
       display: flex;
       gap: 16px;
@@ -124,7 +124,7 @@
     .dot.center { background: var(--grid-center); }
     .dot.claimed { background: var(--accent-pink); }
 
-    /* Main Grid (10x10) */
+    /* Main Grid */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
@@ -147,7 +147,7 @@
       justify-content: center;
       font-size: 0.85rem;
       font-weight: 700;
-      color: #ffffff; /* Scherpe contrasten */
+      color: #ffffff;
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
@@ -170,7 +170,7 @@
       border-color: var(--accent-pink);
     }
 
-    /* Simple Modal */
+    /* Modal Overlay */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -192,7 +192,9 @@
       border-radius: 16px;
       padding: 24px;
       width: 100%;
-      max-width: 400px;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .modal h3 {
@@ -200,7 +202,7 @@
     }
 
     .modal p {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
       margin-bottom: 16px;
     }
@@ -217,7 +219,7 @@
     .badge-bid { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .form-group label {
@@ -234,7 +236,7 @@
       border: 1px solid var(--card-border);
       border-radius: 8px;
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .btn-submit {
@@ -246,6 +248,7 @@
       color: white;
       font-weight: 700;
       cursor: pointer;
+      margin-top: 8px;
     }
 
     footer {
@@ -259,33 +262,33 @@
 
   <header>
     <h1 class="brand-title">Pixelgrids.net</h1>
-    <p class="subtitle">Claim je spot op het grid. Laat je merk of video zien aan een wereldwijd publiek.</p>
+    <p class="subtitle">Claim your spot on the grid. Showcase your brand, campaign, or video to a global audience.</p>
   </header>
 
   <!-- Metrics Summary -->
   <div class="stats-grid">
     <div class="stat-card">
-      <span class="stat-label">Standaard Slot</span>
-      <span class="stat-value">€ 49,- <small>/ 2 wk</small></span>
+      <span class="stat-label">Standard Slot</span>
+      <span class="stat-value">€ 49 <small>/ 2 wks</small></span>
     </div>
     <div class="stat-card highlight">
-      <span class="stat-label">Middelste Slots</span>
-      <span class="stat-value" style="color: var(--grid-center)">Bieding</span>
+      <span class="stat-label">Center Slots</span>
+      <span class="stat-value" style="color: var(--grid-center)">Bidding</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Zendtijd</span>
+      <span class="stat-label">Screen Time</span>
       <span class="stat-value">20 sec</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Max. Video Lengte</span>
+      <span class="stat-label">Max Video Length</span>
       <span class="stat-value">30 sec</span>
     </div>
   </div>
 
   <div class="legend">
-    <div class="legend-item"><span class="dot available"></span> Standaard (€49)</div>
-    <div class="legend-item"><span class="dot center"></span> Middelste (Bieden)</div>
-    <div class="legend-item"><span class="dot claimed"></span> Bezette Slots</div>
+    <div class="legend-item"><span class="dot available"></span> Standard (€49)</div>
+    <div class="legend-item"><span class="dot center"></span> Center (Bidding)</div>
+    <div class="legend-item"><span class="dot claimed"></span> Claimed Slots</div>
   </div>
 
   <!-- Interactive 100 Grid -->
@@ -295,25 +298,45 @@
     &copy; 2026 Pixelgrids.net &bull; Powered by Supabase & Stripe
   </footer>
 
-  <!-- Checkout & Upload Modal -->
+  <!-- Checkout & Submission Modal -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <h3 id="modalTitle">Slot #--</h3>
+      <h3 id="modalTitle">Select Slot #--</h3>
       <div id="modalBadge" class="modal-badge"></div>
       <p id="modalDesc"></p>
 
       <form id="checkoutForm" onsubmit="handleCheckout(event)">
+        <!-- Slot Price / Bid -->
         <div class="form-group" id="priceGroup">
-          <label id="priceLabel">Prijs</label>
+          <label id="priceLabel">Price</label>
           <input type="text" id="priceInput" readonly />
         </div>
 
+        <!-- Target Website Link -->
         <div class="form-group">
-          <label>Upload Video (Max. 30 sec, MP4)</label>
-          <input type="file" accept="video/mp4" required />
+          <label for="targetUrl">Target Website URL</label>
+          <input type="url" id="targetUrl" placeholder="https://yourwebsite.com" required />
         </div>
 
-        <button type="submit" class="btn-submit" id="submitBtn">Ga naar Stripe Checkout</button>
+        <!-- Video Embed/External Link (Optional) -->
+        <div class="form-group">
+          <label for="videoUrl">Video URL (YouTube / External Link)</label>
+          <input type="url" id="videoUrl" placeholder="https://youtube.com/watch?v=..." />
+        </div>
+
+        <!-- Upload Brand Logo -->
+        <div class="form-group">
+          <label for="logoUpload">Brand Logo Image (PNG/JPG)</label>
+          <input type="file" id="logoUpload" accept="image/*" required />
+        </div>
+
+        <!-- Upload Promo Video -->
+        <div class="form-group">
+          <label for="videoUpload">Upload Video File (Max. 30 sec, MP4)</label>
+          <input type="file" id="videoUpload" accept="video/mp4" required />
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Proceed to Stripe Checkout</button>
       </form>
     </div>
   </div>
@@ -328,13 +351,13 @@
     const priceInput = document.getElementById('priceInput');
     const submitBtn = document.getElementById('submitBtn');
 
-    // Middelste 16 vakken in een 10x10 grid (Rijen 4-7, Kolommen 4-7)
+    // Middle 16 slots (Rows 4-7, Columns 4-7)
     const centerSlots = [34, 35, 36, 37, 44, 45, 46, 47, 54, 55, 56, 57, 64, 65, 66, 67];
 
-    // Simuleer bezette slots
+    // Simulated claimed slots
     const claimedSlots = [1, 14];
 
-    // Grid Genereren
+    // Build Grid
     for (let i = 1; i <= 100; i++) {
       const cell = document.createElement('div');
       cell.classList.add('grid-cell');
@@ -355,32 +378,32 @@
 
     function openSlotModal(slotId) {
       if (claimedSlots.includes(slotId)) {
-        alert('Dit slot is momenteel al geclaimd.');
+        alert('This slot is currently claimed.');
         return;
       }
 
-      modalTitle.textContent = `Slot #${slotId} Selecteren`;
+      modalTitle.textContent = `Claim Slot #${slotId}`;
       const isCenter = centerSlots.includes(slotId);
 
       if (isCenter) {
-        modalBadge.textContent = '🔥 MIDDELSTE GRID - VEILING';
+        modalBadge.textContent = '🔥 CENTER GRID - AUCTION';
         modalBadge.className = 'modal-badge badge-bid';
-        modalDesc.textContent = 'Dit betreft een premium positie. Plaats de hoogste bieding voor 2 weken zendtijd (20s loop).';
-        priceLabel.textContent = 'Jouw Bod (€)';
+        modalDesc.textContent = 'Premium position. Place the highest bid for 2 weeks of screen time (20s loop).';
+        priceLabel.textContent = 'Your Bid (€)';
         priceInput.readOnly = false;
         priceInput.value = '49';
         priceInput.min = '49';
         priceInput.type = 'number';
-        submitBtn.textContent = 'Plaats Bod via Stripe';
+        submitBtn.textContent = 'Place Bid via Stripe';
       } else {
-        modalBadge.textContent = 'STANDAARD SLOT';
+        modalBadge.textContent = 'STANDARD SLOT';
         modalBadge.className = 'modal-badge badge-fixed';
-        modalDesc.textContent = 'Vast tarief voor 2 weken zendtijd op het raster (20s loop).';
-        priceLabel.textContent = 'Vast Bedrag';
+        modalDesc.textContent = 'Fixed rate for 2 weeks of screen time on the grid (20s loop).';
+        priceLabel.textContent = 'Fixed Price';
         priceInput.readOnly = true;
-        priceInput.value = '€ 49,-';
+        priceInput.value = '€ 49';
         priceInput.type = 'text';
-        submitBtn.textContent = 'Arekenen via Stripe (€49)';
+        submitBtn.textContent = 'Pay via Stripe (€49)';
       }
 
       modalOverlay.classList.add('active');
@@ -394,7 +417,7 @@
 
     function handleCheckout(e) {
       e.preventDefault();
-      alert('Video gevalideerd (<= 30 seconden). Doorgestuurd naar Stripe API...');
+      alert('Form details & video validated. Redirecting to Stripe API...');
       modalOverlay.classList.remove('active');
     }
   </script>
