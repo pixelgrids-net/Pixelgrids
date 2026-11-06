@@ -3,112 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixelgrids.net - Attention Marketplace</title>
+    <title>Pixelgrids.net - The 10x10 Attention Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .grid-glow {
+            box-shadow: 0 0 25px -5px rgba(168, 85, 247, 0.2);
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center p-4 selection:bg-purple-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-4 selection:bg-purple-500 selection:text-white">
 
-    <!-- Header & Introductie -->
-    <div class="max-w-4xl w-full text-center my-8">
-        <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent pb-2">
+    <!-- Header & Hero -->
+    <header class="max-w-4xl w-full text-center my-6">
+        <div class="inline-block px-3 py-1 bg-purple-900/40 border border-purple-500/30 rounded-full text-xs font-semibold text-purple-300 mb-3">
+            ⚡ Live Attention Marketplace
+        </div>
+        <h1 class="text-4xl md:text-6xl font-black bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent tracking-tight">
             Pixelgrids.net
         </h1>
-        <p class="text-lg md:text-xl text-slate-300 font-medium mt-2">
-            The 10x10 Attention Marketplace
+        <p class="text-base md:text-lg text-slate-300 font-medium mt-2 max-w-xl mx-auto">
+            Claim your spot on the grid. Showcase your brand, campaign, or video to a global audience.
         </p>
-        <p class="text-sm text-slate-400 max-w-xl mx-auto mt-3 leading-relaxed">
-            Claim jouw pixel, showcase je merk, video of couponcode direct op het canvas en bereik bezoekers wereldwijd. Live data gesynchroniseerd via Supabase.
-        </p>
-    </div>
+    </header>
 
-    <!-- Live Teller / Statistieken balk -->
-    <div class="max-w-2xl w-full grid grid-cols-2 gap-4 mb-6">
-        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-center shadow-lg">
-            <span class="block text-2xl font-bold text-purple-400" id="claimed-count">1</span>
-            <span class="text-xs text-slate-400 uppercase tracking-wider">Bezet / Totaal</span>
+    <!-- Stats Bar -->
+    <section class="max-w-2xl w-full grid grid-cols-2 gap-3 mb-6">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-center shadow-md">
+            <span class="block text-2xl font-bold text-purple-400 font-mono" id="claimed-count">0</span>
+            <span class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Claimed</span>
         </div>
-        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-center shadow-lg">
-            <span class="block text-2xl font-bold text-pink-400">99</span>
-            <span class="text-xs text-slate-400 uppercase tracking-wider">Beschikbare Slots</span>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-center shadow-md">
+            <span class="block text-2xl font-bold text-pink-400 font-mono" id="available-count">100</span>
+            <span class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Available Slots</span>
+        </div>
+    </section>
+
+    <!-- 10x10 Grid Container -->
+    <main class="w-full max-w-2xl bg-slate-900/80 border border-slate-800 p-3 md:p-5 rounded-2xl grid-glow">
+        <div id="grid-container" class="grid grid-cols-10 gap-1.5 aspect-square">
+            <div class="col-span-10 flex items-center justify-center text-slate-500 text-sm">Loading grid from Supabase...</div>
+        </div>
+    </main>
+
+    <!-- Modal Popup for Slot Details -->
+    <div id="advertiser-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-center">
+            <button onclick="closeModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+            <div id="modal-emoji" class="text-5xl mb-2">🚀</div>
+            <h3 id="modal-title" class="text-2xl font-bold text-white mb-1">Brand Name</h3>
+            <p id="modal-slot" class="text-xs text-purple-400 mb-4 font-mono">Slot #1</p>
+            
+            <div id="modal-video-container" class="mb-4 hidden rounded-lg overflow-hidden border border-slate-800">
+                <video id="modal-video" controls class="w-full max-h-48 object-cover"></video>
+            </div>
+
+            <div id="modal-coupon-box" class="bg-purple-950/50 border border-purple-500/40 rounded-lg p-2.5 mb-4 hidden">
+                <span class="text-[11px] text-purple-300 block uppercase font-semibold">Discount Code</span>
+                <span id="modal-coupon" class="font-mono text-lg font-bold text-pink-400">WELCOME10</span>
+            </div>
+
+            <a id="modal-link" href="#" target="_blank" class="inline-block w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl shadow-lg hover:brightness-110 transition">
+                Visit Website &rarr;
+            </a>
         </div>
     </div>
 
-    <!-- Het 10x10 Grid Container -->
-    <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 p-4 md:p-6 rounded-2xl shadow-2xl">
-        <div id="grid-container" class="grid grid-cols-10 gap-2 aspect-square">
-            <div class="col-span-10 flex items-center justify-center text-slate-500 text-sm">Grid wordt geladen...</div>
-        </div>
-    </div>
+    <footer class="max-w-xl w-full text-center my-6 text-xs text-slate-500">
+        &copy; 2026 Pixelgrids.net &bull; Powered by Supabase
+    </footer>
 
-    <!-- Footer Uitleg -->
-    <div class="max-w-xl w-full text-center mt-8 text-xs text-slate-500">
-        &copy; 2026 Pixelgrids.net &bull; Alle rechten voorbehouden.
-    </div>
-
-    <!-- Script voor Supabase data ophalen en dynamisch renderen -->
     <script>
         const SUPABASE_URL = 'https://dgsyifssmepxqmdmjmfq.supabase.co'; 
         const SUPABASE_ANON_KEY = 'sb_publishable_uZH6mY9LJveP-xZA9OA3PA_zw0v5ccX';
 
+        let activeData = {};
+
         async function initGrid() {
             const container = document.getElementById('grid-container');
             const claimedCounter = document.getElementById('claimed-count');
+            const availableCounter = document.getElementById('available-count');
             
             try {
                 const { createClient } = supabase;
                 const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-                // Haal data op uit de advertisers tabel
                 const { data, error } = await _supabase.from('advertisers').select('*');
 
                 if (error) {
-                    container.innerHTML = `<div class="col-span-10 text-red-500 text-xs p-4 text-center">DB Error: ${error.message}</div>`;
+                    container.innerHTML = `<div class="col-span-10 text-red-400 text-xs text-center p-4">Database Error: ${error.message}</div>`;
                     return;
                 }
 
                 container.innerHTML = '';
-                const activeSlots = {};
+                activeData = {};
                 let activeCount = 0;
 
                 if (data) {
                     data.forEach(item => {
-                        activeSlots[item.slot_id] = item;
+                        activeData[item.slot_id] = item;
                         activeCount++;
                     });
                 }
 
-                // Update de teller boven het grid
-                if (claimedCounter) {
-                    claimedCounter.innerText = activeCount;
-                }
+                if (claimedCounter) claimedCounter.innerText = activeCount;
+                if (availableCounter) availableCounter.innerText = 100 - activeCount;
 
-                // Bouw de 100 vakjes van het grid
                 for (let i = 1; i <= 100; i++) {
                     const slotDiv = document.createElement('div');
-                    slotDiv.className = "flex items-center justify-center bg-slate-800/90 border border-slate-700/80 rounded-lg text-xs font-bold transition-all duration-200 hover:border-purple-500 hover:scale-105 cursor-pointer overflow-hidden relative aspect-square shadow-sm";
                     
-                    if (activeSlots[i]) {
-                        const advertiser = activeSlots[i];
-                        slotDiv.className += " bg-purple-900/50 border-purple-500 shadow-purple-500/20 shadow-md";
-                        slotDiv.innerHTML = `
-                            <a href="${advertiser.target_url || '#'}" target="_blank" title="${advertiser.brand_name || 'Grid Slot ' + i}" class="w-full h-full flex flex-col items-center justify-center p-1 group">
-                                <span class="text-xl group-hover:scale-110 transition-transform">${advertiser.logo_emoji || '🔥'}</span>
-                            </a>
-                        `;
+                    if (activeData[i]) {
+                        const item = activeData[i];
+                        slotDiv.className = "flex items-center justify-center bg-purple-900/40 border border-purple-500 rounded-lg text-xs font-bold transition hover:scale-105 hover:bg-purple-800/60 cursor-pointer overflow-hidden aspect-square shadow-sm";
+                        slotDiv.onclick = () => openModal(i);
+                        slotDiv.innerHTML = `<span class="text-lg md:text-xl">${item.logo_emoji || '🔥'}</span>`;
                     } else {
-                        slotDiv.innerHTML = `<span class="text-slate-600 font-mono text-[10px] md:text-xs">${i}</span>`;
+                        slotDiv.className = "flex items-center justify-center bg-slate-900/60 border border-slate-800/80 rounded-lg text-[10px] md:text-xs font-mono text-slate-600 hover:border-slate-600 transition cursor-pointer aspect-square";
+                        slotDiv.onclick = () => alert(`Slot ${i} is available!`);
+                        slotDiv.innerHTML = `<span>${i}</span>`;
                     }
 
                     container.appendChild(slotDiv);
                 }
             } catch (err) {
-                container.innerHTML = `<div class="col-span-10 text-red-400 text-xs p-4 text-center">Script Error: ${err.message}</div>`;
+                container.innerHTML = `<div class="col-span-10 text-red-400 text-xs text-center p-4">Error: ${err.message}</div>`;
             }
+        }
+
+        function openModal(slotId) {
+            const item = activeData[slotId];
+            if (!item) return;
+
+            document.getElementById('modal-emoji').innerText = item.logo_emoji || '🚀';
+            document.getElementById('modal-title').innerText = item.brand_name || 'Brand';
+            document.getElementById('modal-slot').innerText = `Slot #${slotId}`;
+            document.getElementById('modal-link').href = item.target_url || '#';
+
+            const videoBox = document.getElementById('modal-video-container');
+            const videoElem = document.getElementById('modal-video');
+            if (item.video_url) {
+                videoElem.src = item.video_url;
+                videoBox.classList.remove('hidden');
+            } else {
+                videoBox.classList.add('hidden');
+            }
+
+            const couponBox = document.getElementById('modal-coupon-box');
+            const couponElem = document.getElementById('modal-coupon');
+            if (item.coupon_code) {
+                couponElem.innerText = item.coupon_code;
+                couponBox.classList.remove('hidden');
+            } else {
+                couponBox.classList.add('hidden');
+            }
+
+            document.getElementById('advertiser-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('advertiser-modal').classList.add('hidden');
+            const videoElem = document.getElementById('modal-video');
+            videoElem.pause();
+            videoElem.src = '';
         }
 
         initGrid();
     </script>
 </body>
+    
 </html>
-
