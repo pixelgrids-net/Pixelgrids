@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixelgrids.net - Attention Marketplace</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex flex-col items-center p-4">
@@ -18,34 +16,33 @@
         <p class="text-slate-400 mt-2">10x10 Attention Marketplace - Live Grid</p>
     </div>
 
-    <!-- Het 10x10 Grid Container -->
     <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-2xl">
         <div id="grid-container" class="grid grid-cols-10 gap-2 aspect-square">
-            <!-- Wordt dynamisch gevuld -->
+            <div class="col-span-10 flex items-center justify-center text-slate-500 text-sm">Laden van data...</div>
         </div>
     </div>
 
     <script>
-        // Vul hier jouw echte Supabase gegevens in als de omgevingsvariabelen niet direct pakken
-        const SUPABASE_URL = 'https://jouw-project.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'jouw-anon-key';
+        // Vul hier jouw echte Supabase URL en Anon Key in
+        const SUPABASE_URL = 'JOUW_SUPABASE_URL'; 
+        const SUPABASE_ANON_KEY = 'JOUW_SUPABASE_ANON_KEY';
 
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        async function loadGridSlots() {
+        async function initGrid() {
             const container = document.getElementById('grid-container');
-            container.innerHTML = '';
-
+            
             try {
-                // Haal data op uit de advertisers tabel
+                const { createClient } = supabase;
+                const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+                // Haal data op
                 const { data, error } = await _supabase.from('advertisers').select('*');
 
                 if (error) {
-                    console.error('Supabase fout:', error);
+                    container.innerHTML = `<div class="col-span-10 text-red-500 text-xs p-2">DB Error: ${error.message}</div>`;
                     return;
                 }
 
+                container.innerHTML = '';
                 const activeSlots = {};
                 if (data) {
                     data.forEach(item => {
@@ -53,7 +50,7 @@
                     });
                 }
 
-                // Genereer de 100 vakjes van het 10x10 grid
+                // Bouw de 100 vakjes
                 for (let i = 1; i <= 100; i++) {
                     const slotDiv = document.createElement('div');
                     slotDiv.className = "flex items-center justify-center bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold transition hover:border-purple-500 cursor-pointer overflow-hidden relative aspect-square";
@@ -73,11 +70,11 @@
                     container.appendChild(slotDiv);
                 }
             } catch (err) {
-                console.error('Laad fout:', err);
+                container.innerHTML = `<div class="col-span-10 text-red-400 text-xs p-2">Script Error: ${err.message}</div>`;
             }
         }
 
-        loadGridSlots();
+        initGrid();
     </script>
 </body>
 </html>
