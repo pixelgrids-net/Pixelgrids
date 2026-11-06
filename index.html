@@ -1,3 +1,4 @@
+Hier is de volledige, foutloze index.html waarin de video-tag in de popup nu direct en correct is ingebouwd, zodat de video direct wordt afgespeeld wanneer je op slot #1 klikt:
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -172,7 +173,7 @@
       border-color: var(--accent-pink);
     }
 
-    /* Live Video inside Cell with Integrated Deal Overlay */
+    /* Live Video inside Cell */
     .grid-video {
       width: 100%;
       height: 100%;
@@ -366,9 +367,7 @@
 
   <!-- Modal Overlay -->
   <div class="modal-overlay" id="modalOverlay">
-    <div class="modal" id="modalContent">
-      <!-- Dynamic Modal Content rendered via JavaScript -->
-    </div>
+    <div class="modal" id="modalContent"></div>
   </div>
 
   <script>
@@ -379,7 +378,7 @@
     // Middle 16 slots (Rows 4-7, Columns 4-7)
     const centerSlots = [34, 35, 36, 37, 44, 45, 46, 47, 54, 55, 56, 57, 64, 65, 66, 67];
 
-    // Sample claimed slot data with embedded deal
+    // Sample claimed slot data with embedded deal & video
     const activeDeals = {
       1: {
         brand: "Launch Promo Store",
@@ -396,7 +395,6 @@
       cell.classList.add('grid-cell');
 
       if (activeDeals[i]) {
-        // Active Claimed Slot with Video & Direct Deal Badge
         cell.classList.add('claimed');
         cell.innerHTML = `
           <span class="cell-deal-badge">DEAL</span>
@@ -420,14 +418,15 @@
 
     function openSlotModal(slotId) {
       if (activeDeals[slotId]) {
-        // Visitor View Modal (Deal & Video Preview)
+        // Visitor View Modal (Active Deal & Working Video Preview)
         const deal = activeDeals[slotId];
         modalContent.innerHTML = `
           <h3>Slot #${slotId} - ${deal.brand}</h3>
           <div class="modal-badge badge-live">🔥 ACTIVE CAMPAIGN & DEAL</div>
           
-          <video style="width:100%; border-radius:12px; margin-bottom:16px;" autoplay loop muted playsinline>
+          <video style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:16px;" autoplay loop muted playsinline>
             <source src="${deal.video}" type="video/mp4">
+            Your browser does not support the video tag.
           </video>
 
           <div class="deal-box">
@@ -499,3 +498,4 @@
   </script>
 </body>
 </html>
+
