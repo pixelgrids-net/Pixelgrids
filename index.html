@@ -18,14 +18,15 @@
 
     <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-2xl">
         <div id="grid-container" class="grid grid-cols-10 gap-2 aspect-square">
+            
             <div class="col-span-10 flex items-center justify-center text-slate-500 text-sm">Laden van data...</div>
         </div>
     </div>
 
     <script>
-        // Vul hier jouw echte Supabase URL en Anon Key in
-        const SUPABASE_URL = 'JOUW_SUPABASE_URL'; 
-        const SUPABASE_ANON_KEY = 'JOUW_SUPABASE_ANON_KEY';
+        // Direct gekoppeld met je Supabase projectgegevens
+        const SUPABASE_URL = 'https://dgsyifssmepxqmdmjmfq.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_uZH6mY9LJveP-xZA9OA3PA_zw0v5ccX';
 
         async function initGrid() {
             const container = document.getElementById('grid-container');
@@ -34,7 +35,7 @@
                 const { createClient } = supabase;
                 const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-                // Haal data op
+                // Haal data op uit de advertisers tabel
                 const { data, error } = await _supabase.from('advertisers').select('*');
 
                 if (error) {
@@ -50,7 +51,7 @@
                     });
                 }
 
-                // Bouw de 100 vakjes
+                // Bouw de 100 vakjes van het grid
                 for (let i = 1; i <= 100; i++) {
                     const slotDiv = document.createElement('div');
                     slotDiv.className = "flex items-center justify-center bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold transition hover:border-purple-500 cursor-pointer overflow-hidden relative aspect-square";
