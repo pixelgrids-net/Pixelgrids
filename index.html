@@ -1,34 +1,402 @@
-<!-- METRICS HEADER -->
-<div class="stats-grid">
-  <div class="stat-card">
-    <span class="stat-label">GRID SLOTS</span>
-    <span class="stat-value">100</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-label">STANDAARD SLOT</span>
-    <span class="stat-value">€ 49,- <small>/ 2 weken</small></span>
-  </div>
-  <div class="stat-card highlight">
-    <span class="stat-label">MIDDELSTE SLOTS</span>
-    <span class="stat-value">Hoogste Bieding</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-label">MAX VIDEO LENGTE</span>
-    <span class="stat-value">30 sec (20s loop)</span>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixelgrids.net - Claim Your Spot</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #161b26;
+      --card-border: #262c3a;
+      --accent-pink: #ff3366;
+      --accent-purple: #8a2be2;
+      --text-main: #f0f4f8;
+      --text-muted: #8c9ba5;
+      --grid-claimed: #ff3366;
+      --grid-hover: #3b82f6;
+      --grid-center: #ffd700;
+    }
 
-<!-- MODAL / CHECKOUT PREVIEW BIJ SELECTIE -->
-<div id="slot-modal" class="modal">
-  <div class="modal-content">
-    <h3>Slot #35 Selecteren (Middelste Grid)</h3>
-    <p class="badge-bidding">🔥 Biedingszone</p>
-    <p>Upload je video (max. 30 seconden MP4) en plaats je bod voor 2 weken zendtijd.</p>
-    
-    <form action="/api/checkout-stripe" method="POST">
-      <label>Jouw Bod (Min. €49):</label>
-      <input type="number" name="bid_amount" min="49" value="49" step="5" required>
-      <button type="submit" class="btn-primary">Plaats Bod via Stripe</button>
-    </form>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+      max-width: 600px;
+    }
+
+    .brand-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    /* Stats Cards Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-card.highlight {
+      border-color: var(--grid-center);
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .stat-value small {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Filters & Legend */
+    .legend {
+      display: flex;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .dot.available { background: #22c55e; }
+    .dot.center { background: var(--grid-center); }
+    .dot.claimed { background: var(--accent-pink); }
+
+    /* Main Grid (10x10) */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+    }
+
+    .grid-cell {
+      aspect-ratio: 1;
+      background: #0f131d;
+      border: 1px solid #1f2636;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff; /* Scherpe contrasten */
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      user-select: none;
+    }
+
+    .grid-cell:hover {
+      border-color: var(--grid-hover);
+      transform: scale(1.05);
+      z-index: 2;
+    }
+
+    .grid-cell.center-zone {
+      border-color: rgba(255, 215, 0, 0.4);
+      background: rgba(255, 215, 0, 0.05);
+    }
+
+    .grid-cell.claimed {
+      background: rgba(255, 51, 102, 0.15);
+      border-color: var(--accent-pink);
+    }
+
+    /* Simple Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .modal h3 {
+      margin-bottom: 8px;
+    }
+
+    .modal p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .modal-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .badge-fixed { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+    .badge-bid { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      background: #0f131d;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    footer {
+      margin-top: 32px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 class="brand-title">Pixelgrids.net</h1>
+    <p class="subtitle">Claim je spot op het grid. Laat je merk of video zien aan een wereldwijd publiek.</p>
+  </header>
+
+  <!-- Metrics Summary -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-label">Standaard Slot</span>
+      <span class="stat-value">€ 49,- <small>/ 2 wk</small></span>
+    </div>
+    <div class="stat-card highlight">
+      <span class="stat-label">Middelste Slots</span>
+      <span class="stat-value" style="color: var(--grid-center)">Bieding</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Zendtijd</span>
+      <span class="stat-value">20 sec</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Max. Video Lengte</span>
+      <span class="stat-value">30 sec</span>
+    </div>
   </div>
-</div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="dot available"></span> Standaard (€49)</div>
+    <div class="legend-item"><span class="dot center"></span> Middelste (Bieden)</div>
+    <div class="legend-item"><span class="dot claimed"></span> Bezette Slots</div>
+  </div>
+
+  <!-- Interactive 100 Grid -->
+  <div class="grid-container" id="grid"></div>
+
+  <footer>
+    &copy; 2026 Pixelgrids.net &bull; Powered by Supabase & Stripe
+  </footer>
+
+  <!-- Checkout & Upload Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3 id="modalTitle">Slot #--</h3>
+      <div id="modalBadge" class="modal-badge"></div>
+      <p id="modalDesc"></p>
+
+      <form id="checkoutForm" onsubmit="handleCheckout(event)">
+        <div class="form-group" id="priceGroup">
+          <label id="priceLabel">Prijs</label>
+          <input type="text" id="priceInput" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>Upload Video (Max. 30 sec, MP4)</label>
+          <input type="file" accept="video/mp4" required />
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Ga naar Stripe Checkout</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const gridContainer = document.getElementById('grid');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBadge = document.getElementById('modalBadge');
+    const modalDesc = document.getElementById('modalDesc');
+    const priceLabel = document.getElementById('priceLabel');
+    const priceInput = document.getElementById('priceInput');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Middelste 16 vakken in een 10x10 grid (Rijen 4-7, Kolommen 4-7)
+    const centerSlots = [34, 35, 36, 37, 44, 45, 46, 47, 54, 55, 56, 57, 64, 65, 66, 67];
+
+    // Simuleer bezette slots
+    const claimedSlots = [1, 14];
+
+    // Grid Genereren
+    for (let i = 1; i <= 100; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('grid-cell');
+      
+      if (claimedSlots.includes(i)) {
+        cell.classList.add('claimed');
+        cell.innerHTML = '🚀';
+      } else {
+        cell.textContent = i;
+        if (centerSlots.includes(i)) {
+          cell.classList.add('center-zone');
+        }
+      }
+
+      cell.addEventListener('click', () => openSlotModal(i));
+      gridContainer.appendChild(cell);
+    }
+
+    function openSlotModal(slotId) {
+      if (claimedSlots.includes(slotId)) {
+        alert('Dit slot is momenteel al geclaimd.');
+        return;
+      }
+
+      modalTitle.textContent = `Slot #${slotId} Selecteren`;
+      const isCenter = centerSlots.includes(slotId);
+
+      if (isCenter) {
+        modalBadge.textContent = '🔥 MIDDELSTE GRID - VEILING';
+        modalBadge.className = 'modal-badge badge-bid';
+        modalDesc.textContent = 'Dit betreft een premium positie. Plaats de hoogste bieding voor 2 weken zendtijd (20s loop).';
+        priceLabel.textContent = 'Jouw Bod (€)';
+        priceInput.readOnly = false;
+        priceInput.value = '49';
+        priceInput.min = '49';
+        priceInput.type = 'number';
+        submitBtn.textContent = 'Plaats Bod via Stripe';
+      } else {
+        modalBadge.textContent = 'STANDAARD SLOT';
+        modalBadge.className = 'modal-badge badge-fixed';
+        modalDesc.textContent = 'Vast tarief voor 2 weken zendtijd op het raster (20s loop).';
+        priceLabel.textContent = 'Vast Bedrag';
+        priceInput.readOnly = true;
+        priceInput.value = '€ 49,-';
+        priceInput.type = 'text';
+        submitBtn.textContent = 'Arekenen via Stripe (€49)';
+      }
+
+      modalOverlay.classList.add('active');
+    }
+
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+      }
+    });
+
+    function handleCheckout(e) {
+      e.preventDefault();
+      alert('Video gevalideerd (<= 30 seconden). Doorgestuurd naar Stripe API...');
+      modalOverlay.classList.remove('active');
+    }
+  </script>
+</body>
+</html>
