@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pixelgrids.net - Claim Your Spot</title>
+  <title>Pixelgrids.net - Claim Your Spot & Discover Deals</title>
   <style>
     :root {
       --bg-color: #0b0f19;
@@ -135,6 +135,7 @@
       padding: 12px;
       border-radius: 16px;
       border: 1px solid var(--card-border);
+      margin-bottom: 32px;
     }
 
     .grid-cell {
@@ -152,6 +153,7 @@
       transition: all 0.2s ease;
       position: relative;
       user-select: none;
+      overflow: hidden;
     }
 
     .grid-cell:hover {
@@ -168,6 +170,81 @@
     .grid-cell.claimed {
       background: rgba(255, 51, 102, 0.15);
       border-color: var(--accent-pink);
+    }
+
+    /* Live Video inside Slot */
+    .grid-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    /* Visitor Deals Section */
+    .deals-section {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+
+    .deals-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .deals-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .badge-deal {
+      background: rgba(255, 51, 102, 0.2);
+      color: var(--accent-pink);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .deal-card {
+      background: #0f131d;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .deal-info h4 {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .deal-info p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .btn-claim-deal {
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
     }
 
     /* Modal Overlay */
@@ -229,7 +306,7 @@
       margin-bottom: 6px;
     }
 
-    .form-group input {
+    .form-group input, .form-group textarea {
       width: 100%;
       padding: 10px;
       background: #0f131d;
@@ -252,9 +329,9 @@
     }
 
     footer {
-      margin-top: 32px;
       font-size: 0.8rem;
       color: var(--text-muted);
+      padding-bottom: 24px;
     }
   </style>
 </head>
@@ -262,7 +339,7 @@
 
   <header>
     <h1 class="brand-title">Pixelgrids.net</h1>
-    <p class="subtitle">Claim your spot on the grid. Showcase your brand, campaign, or video to a global audience.</p>
+    <p class="subtitle">Claim your spot on the grid. Showcase your brand, video & exclusive deals to a global audience.</p>
   </header>
 
   <!-- Metrics Summary -->
@@ -294,6 +371,23 @@
   <!-- Interactive 100 Grid -->
   <div class="grid-container" id="grid"></div>
 
+  <!-- Visitor Deals & Offers Section -->
+  <section class="deals-section">
+    <div class="deals-header">
+      <h2>🔥 Visitor Deals & Offers</h2>
+      <span class="badge-deal">Live Discounts</span>
+    </div>
+
+    <!-- Active Deal 1 -->
+    <div class="deal-card">
+      <div class="deal-info">
+        <h4>Slot #1: Launch Promo</h4>
+        <p>Get 20% off on all products with code <strong>PIXEL20</strong></p>
+      </div>
+      <a href="https://example.com" target="_blank" class="btn-claim-deal">Claim Deal</a>
+    </div>
+  </section>
+
   <footer>
     &copy; 2026 Pixelgrids.net &bull; Powered by Supabase & Stripe
   </footer>
@@ -318,9 +412,15 @@
           <input type="url" id="targetUrl" placeholder="https://yourwebsite.com" required />
         </div>
 
-        <!-- Video Embed/External Link (Optional) -->
+        <!-- Visitor Deal / Discount Offer -->
         <div class="form-group">
-          <label for="videoUrl">Video URL (YouTube / External Link)</label>
+          <label for="visitorDeal">Exclusive Visitor Deal (Optional)</label>
+          <input type="text" id="visitorDeal" placeholder="e.g. 20% OFF with code PIXEL20" />
+        </div>
+
+        <!-- Video External Link (Optional) -->
+        <div class="form-group">
+          <label for="videoUrl">Video Link (YouTube / Vimeo / Direct URL)</label>
           <input type="url" id="videoUrl" placeholder="https://youtube.com/watch?v=..." />
         </div>
 
@@ -354,17 +454,19 @@
     // Middle 16 slots (Rows 4-7, Columns 4-7)
     const centerSlots = [34, 35, 36, 37, 44, 45, 46, 47, 54, 55, 56, 57, 64, 65, 66, 67];
 
-    // Simulated claimed slots
-    const claimedSlots = [1, 14];
-
     // Build Grid
     for (let i = 1; i <= 100; i++) {
       const cell = document.createElement('div');
       cell.classList.add('grid-cell');
-      
-      if (claimedSlots.includes(i)) {
+
+      if (i === 1) {
+        // Slot #1 is rendered as a Live Video Slot
         cell.classList.add('claimed');
-        cell.innerHTML = '🚀';
+        cell.innerHTML = `
+          <video class="grid-video" autoplay loop muted playsinline>
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-fireworks-in-the-sky-41549-large.mp4" type="video/mp4">
+          </video>
+        `;
       } else {
         cell.textContent = i;
         if (centerSlots.includes(i)) {
@@ -377,8 +479,8 @@
     }
 
     function openSlotModal(slotId) {
-      if (claimedSlots.includes(slotId)) {
-        alert('This slot is currently claimed.');
+      if (slotId === 1) {
+        alert('Slot #1 is currently active with a live campaign. Click "Claim Deal" below to visit their deal!');
         return;
       }
 
@@ -417,7 +519,7 @@
 
     function handleCheckout(e) {
       e.preventDefault();
-      alert('Form details & video validated. Redirecting to Stripe API...');
+      alert('Form details & video validated. Redirecting to Stripe Checkout...');
       modalOverlay.classList.remove('active');
     }
   </script>
