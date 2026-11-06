@@ -7,29 +7,53 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center p-4">
+<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center p-4 selection:bg-purple-500 selection:text-white">
 
+    <!-- Header & Introductie -->
     <div class="max-w-4xl w-full text-center my-8">
-        <h1 class="text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+        <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent pb-2">
             Pixelgrids.net
         </h1>
-        <p class="text-slate-400 mt-2">10x10 Attention Marketplace - Live Grid</p>
+        <p class="text-lg md:text-xl text-slate-300 font-medium mt-2">
+            The 10x10 Attention Marketplace
+        </p>
+        <p class="text-sm text-slate-400 max-w-xl mx-auto mt-3 leading-relaxed">
+            Claim jouw pixel, showcase je merk, video of couponcode direct op het canvas en bereik bezoekers wereldwijd. Live data gesynchroniseerd via Supabase.
+        </p>
     </div>
 
-    <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-2xl">
-        <div id="grid-container" class="grid grid-cols-10 gap-2 aspect-square">
-            
-            <div class="col-span-10 flex items-center justify-center text-slate-500 text-sm">Laden van data...</div>
+    <!-- Live Teller / Statistieken balk -->
+    <div class="max-w-2xl w-full grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-center shadow-lg">
+            <span class="block text-2xl font-bold text-purple-400" id="claimed-count">1</span>
+            <span class="text-xs text-slate-400 uppercase tracking-wider">Bezet / Totaal</span>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-center shadow-lg">
+            <span class="block text-2xl font-bold text-pink-400">99</span>
+            <span class="text-xs text-slate-400 uppercase tracking-wider">Beschikbare Slots</span>
         </div>
     </div>
 
+    <!-- Het 10x10 Grid Container -->
+    <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 p-4 md:p-6 rounded-2xl shadow-2xl">
+        <div id="grid-container" class="grid grid-cols-10 gap-2 aspect-square">
+            <div class="col-span-10 flex items-center justify-center text-slate-500 text-sm">Grid wordt geladen...</div>
+        </div>
+    </div>
+
+    <!-- Footer Uitleg -->
+    <div class="max-w-xl w-full text-center mt-8 text-xs text-slate-500">
+        &copy; 2026 Pixelgrids.net &bull; Alle rechten voorbehouden.
+    </div>
+
+    <!-- Script voor Supabase data ophalen en dynamisch renderen -->
     <script>
-        // Direct gekoppeld met je Supabase projectgegevens
         const SUPABASE_URL = 'https://dgsyifssmepxqmdmjmfq.supabase.co'; 
         const SUPABASE_ANON_KEY = 'sb_publishable_uZH6mY9LJveP-xZA9OA3PA_zw0v5ccX';
 
         async function initGrid() {
             const container = document.getElementById('grid-container');
+            const claimedCounter = document.getElementById('claimed-count');
             
             try {
                 const { createClient } = supabase;
@@ -39,39 +63,47 @@
                 const { data, error } = await _supabase.from('advertisers').select('*');
 
                 if (error) {
-                    container.innerHTML = `<div class="col-span-10 text-red-500 text-xs p-2">DB Error: ${error.message}</div>`;
+                    container.innerHTML = `<div class="col-span-10 text-red-500 text-xs p-4 text-center">DB Error: ${error.message}</div>`;
                     return;
                 }
 
                 container.innerHTML = '';
                 const activeSlots = {};
+                let activeCount = 0;
+
                 if (data) {
                     data.forEach(item => {
                         activeSlots[item.slot_id] = item;
+                        activeCount++;
                     });
+                }
+
+                // Update de teller boven het grid
+                if (claimedCounter) {
+                    claimedCounter.innerText = activeCount;
                 }
 
                 // Bouw de 100 vakjes van het grid
                 for (let i = 1; i <= 100; i++) {
                     const slotDiv = document.createElement('div');
-                    slotDiv.className = "flex items-center justify-center bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold transition hover:border-purple-500 cursor-pointer overflow-hidden relative aspect-square";
+                    slotDiv.className = "flex items-center justify-center bg-slate-800/90 border border-slate-700/80 rounded-lg text-xs font-bold transition-all duration-200 hover:border-purple-500 hover:scale-105 cursor-pointer overflow-hidden relative aspect-square shadow-sm";
                     
                     if (activeSlots[i]) {
                         const advertiser = activeSlots[i];
-                        slotDiv.className += " bg-purple-900/40 border-purple-500";
+                        slotDiv.className += " bg-purple-900/50 border-purple-500 shadow-purple-500/20 shadow-md";
                         slotDiv.innerHTML = `
-                            <a href="${advertiser.target_url || '#'}" target="_blank" title="${advertiser.brand_name || 'Grid'}" class="w-full h-full flex flex-col items-center justify-center p-1">
-                                <span class="text-xl">${advertiser.logo_emoji || '🔥'}</span>
+                            <a href="${advertiser.target_url || '#'}" target="_blank" title="${advertiser.brand_name || 'Grid Slot ' + i}" class="w-full h-full flex flex-col items-center justify-center p-1 group">
+                                <span class="text-xl group-hover:scale-110 transition-transform">${advertiser.logo_emoji || '🔥'}</span>
                             </a>
                         `;
                     } else {
-                        slotDiv.innerHTML = `<span class="text-slate-600">${i}</span>`;
+                        slotDiv.innerHTML = `<span class="text-slate-600 font-mono text-[10px] md:text-xs">${i}</span>`;
                     }
 
                     container.appendChild(slotDiv);
                 }
             } catch (err) {
-                container.innerHTML = `<div class="col-span-10 text-red-400 text-xs p-2">Script Error: ${err.message}</div>`;
+                container.innerHTML = `<div class="col-span-10 text-red-400 text-xs p-4 text-center">Script Error: ${err.message}</div>`;
             }
         }
 
@@ -79,3 +111,4 @@
     </script>
 </body>
 </html>
+
